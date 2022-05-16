@@ -1,0 +1,405 @@
+---
+title: "HW2 KEY"
+author: "Jacob Martin"
+date: "Spring 2022"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.width=10, 
+                      fig.height=6, 
+                      fig.align = "center")
+
+# Load the needed package(s) here
+pacman::p_load(tidyverse, gridExtra)
+
+# Change the default theme below:
+theme_set(theme_bw())
+
+```
+
+## Part 1: McDonald's Nutrition
+***
+
+The "fast food menu.csv" data set contains the nutritional information on many different non-drink options offered at McDonald's. Use an appropriate theme for the graphs.
+
+***
+
+
+### 1a) Calories by serving size
+
+***
+
+Create horizontal box plots of serving_size_grams by Category. Fill the box plots with all the same color, but use a different color than the default. Change the label of the x-axis to 'Serving Size (grams)'. Which Category has the largest and smallest serving sizes overall?
+
+***
+
+```{r 1a_boxplots, message = FALSE}
+# Start by reading in the data here. 
+# Name the data set McD
+McD <- read.csv("fast food menu.csv")
+
+# Create the boxplot below
+ggplot(data = McD,
+       mapping = aes(x = serving_size_grams,
+                     y = Category)) +
+  
+  # Using McDonald's yellow and red to color the box plots
+  geom_boxplot(fill = "#FFC72C",
+               color = "#DA291C") + 
+  
+  labs(x = "Serving Size (grams)")
+```
+
+Snacks have the smallest typical serving size and salads, surprisingly, have the largest typical serving size!
+
+
+### 1b) Calories by Category, Serving Size, and Nutritional Info
+***
+
+Create and SAVE create 6 similar scatterplots with:
+
+-	Calories on the y-axis 
+-	Category indicated by color
+-	serving_size_grams represented by size. 
+-	Each graph should have points and a single (straight) regression line, without the shaded region.
+
+Make sure to change the labels on the axes & legends to be more readable, if necessary
+
+i.   Total Fat
+ii.	 Saturated Fat
+iii. Cholesterol
+iv.	 Sodium
+v.	 Protein
+vi.  Sugars
+
+add + guides(size = "none") to each of the six plots to hide the legend for the size aesthetic
+
+***
+
+
+
+#### Part 1bi. Total Fat
+
+```{r 1bi_totalFat, message = F}
+# Create, save, and display the scatterplot with x = Total Fat below
+gg_cals_tf <- 
+  
+  ggplot(data = McD,
+         mapping = aes(x = Total.Fat, 
+                       y = Calories)) +
+  
+  geom_point(mapping = aes(color = Category,
+                           size = serving_size_grams),
+             alpha = 0.5) + 
+  
+  geom_smooth(method = "lm",
+              se = F) +
+  
+  labs(x = "Total Fat") +
+  
+  guides(size = "none")
+  
+gg_cals_tf
+```
+
+
+
+
+#### Part 1bii. - vi. Other 5 scatterplots
+
+```{r 1bii_vi, message = F}
+## Create and save but don't display the scatterplot with
+
+# ii) x = Saturated Fat below
+gg_cals_sf <- 
+  
+  ggplot(data = McD,
+         mapping = aes(x = Saturated.Fat, 
+                       y = Calories)) +
+  
+  geom_point(mapping = aes(color = Category,
+                           size = serving_size_grams),
+             alpha = 0.5) + 
+  
+  geom_smooth(method = "lm",
+              se = F) +
+  
+  labs(x = "Saturated Fat") +
+  
+  guides(size = "none")
+
+
+# iii) x = Cholesterol below
+gg_cals_chol <- 
+  
+  ggplot(data = McD,
+         mapping = aes(x = Cholesterol, 
+                       y = Calories)) +
+  
+  geom_point(mapping = aes(color = Category,
+                           size = serving_size_grams),
+             alpha = 0.5) + 
+  
+  geom_smooth(method = "lm",
+              se = F)  +
+  
+  guides(size = "none")
+
+
+# iv) x = Sodium
+gg_cals_na <- 
+  
+  ggplot(data = McD,
+         mapping = aes(x = Sodium, 
+                       y = Calories)) +
+  
+  geom_point(mapping = aes(color = Category,
+                           size = serving_size_grams),
+             alpha = 0.5) + 
+  
+  geom_smooth(method = "lm",
+              se = F)  +
+  
+  guides(size = "none")
+
+# v) x = Protein below
+gg_cals_pro <- 
+  
+  ggplot(data = McD,
+         mapping = aes(x = Protein, 
+                       y = Calories)) +
+  
+  geom_point(mapping = aes(color = Category,
+                           size = serving_size_grams),
+             alpha = 0.5) + 
+  
+  geom_smooth(method = "lm",
+              se = F)  +
+  
+  guides(size = "none")
+
+
+# vi) x = Sugars below
+gg_cals_sug <- 
+  
+  ggplot(data = McD,
+         mapping = aes(x = Sugars, 
+                       y = Calories)) +
+  
+  geom_point(mapping = aes(color = Category,
+                           size = serving_size_grams),
+             alpha = 0.5) + 
+  
+  geom_smooth(method = "lm",
+              se = F)  +
+  
+  guides(size = "none")
+
+
+  
+```
+
+
+
+### Part 1c)
+
+***
+
+Present the 6 scatterplots using grid.arrange(), as described on page 1. Put all six together with 3 rows.
+
+***
+
+```{r 1c_scatter_grid, message = FALSE}
+# Use grid.arrange below to place all 6 scatter plots together
+grid.arrange(gg_cals_tf, 
+             gg_cals_sf,
+             gg_cals_chol,
+             gg_cals_na,
+             gg_cals_pro,
+             gg_cals_sug,
+             nrow = 3)
+```
+
+
+
+### Part 1d) Long Format
+***
+
+Run the code in the chunk below to transform the data into a “long” format.
+
+***
+
+```{r 1d_long}
+# Using pivot_longer to create a new data set in the "long" format
+McD_long <- 
+  McD %>% 
+  
+  dplyr::select(Category, serving_size_grams, Calories, Total.Fat, 
+                Saturated.Fat, Cholesterol, Sodium, Protein, Sugars) %>% 
+  
+  pivot_longer(cols = Total.Fat:Sugars,
+               names_to = "nutrition_type",
+               values_to = "amount") %>% 
+  
+  mutate(nutrition_type = as_factor(nutrition_type))
+
+McD_long
+
+```
+
+***
+
+Using McD_long, create the same six scatterplots from part b), but using facet_wrap instead of grid.arrange.
+
+You should only need 1 ggplot function, and use 3 rows again. Make sure to use a good choice for the scales argument inside facet_wrap.
+
+***
+```{r 1d_facet, message = F}
+# Use the transformed data and facet_wrap to create a similar graph to 1c)
+ggplot(data = McD_long,
+       mapping = aes(x = amount,
+                     y = Calories)) +
+  
+  geom_point(mapping = aes(color = Category,
+                           size = serving_size_grams),
+             alpha = 0.50) + 
+  
+  geom_smooth(method = "lm",
+              se = F) + 
+  
+  facet_wrap(facets = ~ nutrition_type,
+             nrow = 3,
+             scales = "free_x") +
+  
+  
+  
+  # Add the two lines below to your code 
+  theme(legend.position = "top") + 
+  
+  guides(size = "none") +
+  
+  labs(x = NULL) 
+```
+
+
+### Part 1e) 
+
+***
+
+Which set of graphs do you prefer? Describe why
+
+***
+
+Answer may vary, but the graph in part d) is what I prefer since the legend only appears once in the plot, not once for each of the graphs, which takes up the majority of the space on the plot.
+
+
+
+
+
+
+
+
+
+
+## Question 2: NFL Drive Data
+
+***
+
+Use the NFL Drive data set contains how an NFL drive begins and ends for 30374 drives for the 2016 - 2021 NFL seasons. A 'drive' in football is a series of plays where the same team is on offense and ends when the teams switch being on offense or defense. 
+
+***
+
+```{r load_nfl}
+### Import the NFL Drive data set below:
+nfl <- read.csv("NFL Drive.csv")
+
+
+# Run the code below after reading in your data to change the order of the groups to something more preferable:
+nfl <- 
+  nfl %>% 
+  
+  filter(complete.cases(.)) %>% 
+  
+  mutate(drive_start = factor(drive_start, 
+                              levels = c("Kickoff", "Punt", 
+                                         "Fumble", "Interception")),
+         
+         drive_end = factor(drive_end,
+                            levels = c("Turnover", "Punt",
+                                       "Field Goal", "Touchdown")))
+```
+
+
+
+
+
+### Part 2a) Bar Chart for Drive End
+***
+
+Create a single bar chart drive_end with the counts for each outcome on the y-axis. Have the bars all be the same color other than the default color and the x-axis label of "Drive Result".
+
+***
+
+```{r 2a_barchart}
+# Create the bar chart for drive_end below.
+ggplot(data = nfl,
+       mapping = aes(x = drive_end)) +
+  
+  geom_bar(color = "black",
+           fill = "steelblue") +
+  
+  labs(x = "Drive Result")
+
+```
+
+
+
+### Part 2b) Bar Chart by Drive Beginning
+
+Create 4 bar charts for drive_end: One for each way a drive can begin (drive_start). Have the proportion displayed on the y-axis instead of the counts and all 4 charts in the same row.
+
+Adjust the plots so the x-axis labels can be seen properly (necessary for most of the graphs).  You might use this code: + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.25))  (you can adjust the values in element_text if you like).
+
+```{r 2b_4BarCharts}
+# Write you code to create the bar charts of drive result with small multiples for each drive beginning and the proportion on the x-axis
+ggplot(data = nfl,
+       mapping = aes(x = drive_end)) +
+  
+  geom_bar(mapping = aes(group = 1,
+                         y = ..prop..),
+           fill = "steelblue",
+           color = "black") + 
+  
+  labs(x = "Drive Result") +
+  
+  facet_wrap(facets = ~ drive_start,
+             nrow = 1) + 
+  
+  theme(axis.text.x = element_text(angle = 90,
+                                   hjust = 1,
+                                   vjust = 0.25))
+
+
+
+```
+
+
+
+### Part 2c) Drive Result by Drive Start
+***
+
+Does it appear that teams are more likely to score (drive_end = Touchdown or Field Goal) depending on how the drive started? Explain your answer just based on the graphs from part b).
+
+***
+
+It does appear that how drives begin do have an effect on how often a drive ends in a score. 
+
+The results if the drive begins from a punt or a kickoff appear to be the same and drives started after an intercept or fumble also appear to have similar results. Drives that start after the opponent turns the ball over (fumble or interception) are more likely to end in a scoring play than drives that being after a kickoff or punt.
+
+
+
+
